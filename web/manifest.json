@@ -1,0 +1,10 @@
+{
+  "name": "ToolSpark AI",
+  "short_name": "ToolSpark",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0F0F23",
+  "theme_color": "#3F51B5",
+  "description": "6 AI-powered productivity tools in one app",
+  "orientation": "portrait-primary"
+}
