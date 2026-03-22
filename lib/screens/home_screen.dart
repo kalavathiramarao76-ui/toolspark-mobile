@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../models/tool_model.dart';
 import '../providers/app_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../widgets/auth_wall.dart';
+import '../services/auth_service.dart';
 import 'email_screen.dart';
 import 'meeting_screen.dart';
 import 'code_review_screen.dart';
@@ -12,8 +14,27 @@ import 'product_screen.dart';
 import 'threads_screen.dart';
 import 'favorites_settings_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final AuthService _authService = AuthService();
+  bool _showAuthWall = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final needsAuth = await _authService.needsAuth();
+    if (mounted) setState(() => _showAuthWall = needsAuth);
+  }
 
   void _navigateToTool(BuildContext context, String route) {
     Widget screen;
@@ -48,7 +69,9 @@ class HomeScreen extends StatelessWidget {
     final favorites = context.watch<FavoritesProvider>();
 
     return Scaffold(
-      body: SafeArea(
+      body: Stack(
+        children: [
+          SafeArea(
         child: CustomScrollView(
           slivers: [
             // Header
@@ -205,6 +228,13 @@ class HomeScreen extends StatelessWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
+      ),
+          if (_showAuthWall)
+            AuthWall(
+              authService: _authService,
+              onSignedIn: () => setState(() => _showAuthWall = false),
+            ),
+        ],
       ),
     );
   }
